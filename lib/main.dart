@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/intro_screen.dart';
-import 'screens/login_screen.dart';
+import 'screens/intro_slider.dart';
+import 'screens/login_page.dart';
 
 void main() {
   runApp(const ParkKingApp());
@@ -20,8 +20,8 @@ class ParkKingApp extends StatelessWidget {
       ),
       initialRoute: '/intro', // Rota inicial
       routes: {
-        '/intro': (context) =>  IntroSliderPage(),
-        '/login': (context) =>  LoginScreen(),
+        '/intro': (context) => IntroSliderPage(),
+        '/login': (context) => LoginPage(role: 'Cliente'), // Exemplo de rota
       },
     );
   }
