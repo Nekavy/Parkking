@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:parkking/main.dart';
 
 class IntroSliderPage extends StatefulWidget {
   @override
@@ -34,110 +35,140 @@ class _IntroSliderPageState extends State<IntroSliderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      backgroundColor: Colors.white, // Fundo branco para toda a tela
+      body: Column(
         children: [
-          // Slider com as imagens e texto
-          PageView.builder(
-            controller: _controller,
-            onPageChanged: (page) {
-              setState(() {
-                _currentPage = page;
-              });
-            },
-            itemCount: _slides.length,
-            itemBuilder: (context, index) {
-              final slide = _slides[index];
-              return _buildSlide(slide);
-            },
-          ),
-
-          // Indicadores de página
-          Positioned(
-            bottom: 250,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: SmoothPageIndicator(
-                controller: _controller,
-                count: _slides.length,
-                effect: ExpandingDotsEffect(
-                  dotColor: Colors.grey,
-                  activeDotColor: Colors.blue,
-                  dotHeight: 8,
-                  dotWidth: 8,
-                ),
+          // Nome da aplicação no topo
+          Container(
+            color: Colors.white, // Fundo branco no topo
+            padding: const EdgeInsets.only(top: 40.0, bottom: 16.0),
+            child: Text(
+              "ParkKing",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
           ),
 
-          // Área dos botões com fundo branco e bordas arredondadas
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
+          // Slider com as imagens e texto
+          Expanded(
+            child: PageView.builder(
+              controller: _controller,
+              onPageChanged: (page) {
+                setState(() {
+                  _currentPage = page;
+                });
+              },
+              itemCount: _slides.length,
+              itemBuilder: (context, index) {
+                final slide = _slides[index];
+                return _buildSlide(slide);
+              },
+            ),
+          ),
+
+          // Área dos botões, título, legenda e indicadores
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Título da página atual
+                Text(
+                  _slides[_currentPage]['title']!,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, -2),
+                SizedBox(height: 8),
+
+                // Descrição da página atual
+                Text(
+                  _slides[_currentPage]['description']!,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
                   ),
-                ],
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton(
-                    onPressed: _currentPage == _slides.length - 1
-                        ? () => _navigateToRoleSelection(context, "Particular")
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      minimumSize: Size(double.infinity, 56), // Botão mais longo
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+
+                // Legenda e indicadores de página
+                Text(
+                  _slides[_currentPage]['caption']!,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.black54,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                SmoothPageIndicator(
+                  controller: _controller,
+                  count: _slides.length,
+                  effect: ExpandingDotsEffect(
+                    dotColor: Colors.grey,
+                    activeDotColor: Colors.blue,
+                    dotHeight: 8,
+                    dotWidth: 8,
+                  ),
+                ),
+
+                SizedBox(height: 24),
+
+                // Botões
+                ElevatedButton(
+                  onPressed:() { Navigator.of(context).pushReplacementNamed('/login');},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      "Particular",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    minimumSize: Size(double.infinity, 56),
+                  ),
+                  child: Text(
+                    "Particular",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _currentPage == _slides.length - 1
-                        ? () => _navigateToRoleSelection(context, "Cliente")
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade300,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      minimumSize: Size(double.infinity, 56), // Botão mais longo
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed:() { Navigator.of(context).pushReplacementNamed('/login');},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade300,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      "Cliente",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    minimumSize: Size(double.infinity, 56),
+                  ),
+                  child: Text(
+                    "Cliente",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -148,85 +179,22 @@ class _IntroSliderPageState extends State<IntroSliderPage> {
   Widget _buildSlide(Map<String, String> slide) {
     return Column(
       children: [
-        // Imagem ocupa metade da tela
         Expanded(
-          flex: 1,
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
-                child: Image.asset(
-                  slide['image']!,
-                  fit: BoxFit.cover, // Garante que a imagem preencha sem cortes
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ),
-              Positioned(
-                bottom: 16,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    slide['caption']!,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Conteúdo do slide
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                slide['title']!,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 16),
-              Text(
-                slide['description']!,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black54,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+          flex: 2,
+          child: Container(
+            color: Colors.white, // Fundo branco para a área da imagem
+            child: Image.asset(
+              slide['image']!,
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
           ),
         ),
       ],
     );
   }
 
-  void _navigateToRoleSelection(BuildContext context, String role) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => RoleSelectionPage(role: role),
-      ),
-    );
-  }
+
 }
 
 class RoleSelectionPage extends StatelessWidget {
