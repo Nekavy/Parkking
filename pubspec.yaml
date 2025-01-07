@@ -11,12 +11,16 @@ dependencies:
   flutter:
     sdk: flutter
   smooth_page_indicator: ^1.2.0+3
+  google_maps_flutter: ^2.5.0
+  google_maps_flutter_platform_interface: ^2.4.0
+  google_places_flutter: ^2.0.9
+  http: ^1.2.2
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0  # Atualizar para a versão mais recente
 
 flutter:
   uses-material-design: true

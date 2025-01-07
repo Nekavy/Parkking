@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/intro_slider.dart';
 import 'screens/login_page.dart';
+import 'screens/home_page.dart';
 
 void main() {
   runApp(const ParkKingApp());
@@ -22,6 +23,7 @@ class ParkKingApp extends StatelessWidget {
       routes: {
         '/intro': (context) => IntroSliderPage(),
         '/login': (context) => LoginPage(),
+        '/home': (context) => MyApp(),
       },
     );
   }

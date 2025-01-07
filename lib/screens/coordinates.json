@@ -1,0 +1,15 @@
+{
+    "locations": [
+      {
+        "name": "Ponto A",
+        "latitude": 37.7749,
+        "longitude": -122.4194
+      },
+      {
+        "name": "Ponto B",
+        "latitude": 37.8044,
+        "longitude": -122.2711
+      }
+    ]
+  }
+  

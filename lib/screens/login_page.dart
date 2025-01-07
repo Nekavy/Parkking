@@ -54,9 +54,7 @@ class LoginPage extends StatelessWidget {
 
               // Botão "Next"
               ElevatedButton(
-                onPressed: () {
-                  // Ação do botão "Next"
-                },
+                onPressed: () { Navigator.of(context).pushReplacementNamed('/home');},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
