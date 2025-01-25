@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "189787245225",
+    "project_id": "parkking-39acb",
+    "storage_bucket": "parkking-39acb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:189787245225:android:68a3000a3ead1e734337b8",
+        "android_client_info": {
+          "package_name": "com.boreis.parkking"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZoS6FUzV4jl0v-J6vHvdtw2kUz-Xn6tc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

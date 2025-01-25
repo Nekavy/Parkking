@@ -2,31 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  
-  // Configuração do GoogleSignIn com Web Client ID
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: "189787245225-jj0rpcml92c56pe3mlk06aviq000spnu.apps.googleusercontent.com", // Substitui pelo teu Web Client ID do Firebase
-  );
 
-  // Função para login com email e senha
-  Future<void> _loginWithEmail() async {
+  // Função para registar utilizador com email e senha
+  Future<void> _registerWithEmail() async {
+    if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('As passwords não coincidem')),
+      );
+      return;
+    }
+
     try {
-      await _auth.signInWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home'); // Redireciona para a página principal após o registo
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro: ${e.message}')),
@@ -34,19 +37,20 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Função para login com Google
-  Future<void> _loginWithGoogle() async {
+  // Função para registo com Google
+  Future<void> _registerWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return; // O utilizador cancelou o login
 
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
       await _auth.signInWithCredential(credential);
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home'); // Redireciona para a página principal
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro: ${e.message}')),
@@ -69,13 +73,13 @@ class _LoginPageState extends State<LoginPage> {
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black),
                   onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/intro');
+                    Navigator.of(context).pop(); // Volta para a página anterior
                   },
                 ),
               ),
               const SizedBox(height: 16),
               const Text(
-                "ParkKing",
+                "Registe-se",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -84,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 12),
               const Text(
-                "Entre na sua conta rapidamente.",
+                "Crie a sua conta para começar.",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -95,9 +99,15 @@ class _LoginPageState extends State<LoginPage> {
               _buildTextField(label: "Email", controller: _emailController),
               const SizedBox(height: 16),
               _buildTextField(label: "Password", controller: _passwordController, obscureText: true),
+              const SizedBox(height: 16),
+              _buildTextField(
+                label: "Confirmar Password",
+                controller: _confirmPasswordController,
+                obscureText: true,
+              ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _loginWithEmail,
+                onPressed: _registerWithEmail,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
@@ -106,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 child: const Text(
-                  "Entrar com Email",
+                  "Registar",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -115,22 +125,32 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _loginWithGoogle,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // Cor do botão do Google
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  minimumSize: const Size(double.infinity, 50),
+              const Text(
+                "OU",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black54),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _registerWithGoogle,
+                icon: Image.asset(
+                  'assets/google_logo.png', // Certifique-se de ter o logo do Google na pasta assets
+                  height: 24,
+                  width: 24,
                 ),
-                child: const Text(
-                  "Entrar com Google",
+                label: const Text(
+                  "Registar com Google",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  minimumSize: const Size(double.infinity, 50),
                 ),
               ),
               const SizedBox(height: 24),
@@ -138,15 +158,15 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Não tem uma conta?",
+                    "Já tem uma conta?",
                     style: TextStyle(color: Colors.black54, fontSize: 14),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/register'); // Redireciona para a página de registo
+                      Navigator.pushReplacementNamed(context, '/login'); // Volta para a página de login
                     },
                     child: const Text(
-                      "Registe-se aqui",
+                      "Entre aqui",
                       style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                     ),
                   ),
