@@ -2,35 +2,25 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'components/utils/calculator.dart'; // Caminho para a classe
+import 'components/home/slide_menu.dart'; // SlideMenu importado
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
+class HomePage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Google Maps Flutter App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MapScreen(),
-    );
-  }
+  _HomePageState createState() => _HomePageState();
 }
+  List<Map<String, dynamic>> nearbyPlacesData = [];
 
-class MapScreen extends StatefulWidget {
-  @override
-  _MapScreenState createState() => _MapScreenState();
-}
-
-class _MapScreenState extends State<MapScreen> {
+class _HomePageState extends State<HomePage> {
   late GoogleMapController mapController;
   Set<Marker> _markers = Set();
-  final LatLng _center = LatLng(37.7749, -122.4194); // Default center
+  final LatLng _center = LatLng(37.7749, -122.4194); // Posição inicial do mapa
+  
   String _errorMessage = '';
   List<dynamic> _searchResults = [];
   final String _apiKey = 'AIzaSyDdwdpjWLdkfnFwZnhtAG3z64cseSqcycc'; // Substituir pela tua chave da API
-
+  bool _isMenuVisible = false; // Controla a visibilidade do SlideMenu
+  
   // Função para buscar locais utilizando a Google Places API
   Future<void> _searchPlaces(String query) async {
     final Uri url = Uri.parse(
@@ -57,10 +47,18 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  void _selectPlace(dynamic place) {
+  void _selectPlace(dynamic place) async{
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
     final placeName = place['name'];
+    //testes envio de cordenadas para a calculadora
+    print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWLatitude: $lat");  
+    print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELongitude: $lng");
+    //calculator.calculate(lat, lng);
+    Calculator calculator = Calculator();
+    List<Map<String, dynamic>> nearbyPlaces = await calculator.calculate(lat, lng);
+    nearbyPlacesData = nearbyPlaces;
+    print(nearbyPlaces); // Ver a lista no terminal
 
     // Adicionar marcador e mover a câmara para a localização escolhida
     setState(() {
@@ -78,22 +76,33 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
 
-    // Limpar resultados de pesquisa
+    // Limpar resultados de pesquisa e mostrar o SlideMenu
     setState(() {
       _searchResults.clear();
+      _isMenuVisible = true; // Mostrar SlideMenu após mover o mapa
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Google Maps - Pesquisa de Locais'),
-      ),
-      body: Column(
+      resizeToAvoidBottomInset: false,
+      body: Stack(
         children: [
+          // O conteúdo principal, como o mapa
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: _center,
+              zoom: 10,
+            ),
+            onMapCreated: (controller) {
+              mapController = controller;
+            },
+            markers: _markers,
+          ),
+          // O menu de pesquisa sobre o mapa
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 100.0, left: 16.0, right: 16.0),
             child: Column(
               children: [
                 TextField(
@@ -101,6 +110,20 @@ class _MapScreenState extends State<MapScreen> {
                     hintText: 'Pesquise por um local',
                     suffixIcon: Icon(Icons.search),
                     errorText: _errorMessage.isEmpty ? null : _errorMessage,
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide(color: Colors.grey, width: 1),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide(color: Colors.grey, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide(color: Colors.blue, width: 2),
+                    ),
                   ),
                   onChanged: (query) {
                     if (query.isNotEmpty) {
@@ -113,37 +136,35 @@ class _MapScreenState extends State<MapScreen> {
                   },
                 ),
                 if (_searchResults.isNotEmpty)
-                  Container(
-                    height: 200, // Limitar altura da lista
-                    child: ListView.builder(
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final place = _searchResults[index];
-                        return ListTile(
-                          title: Text(place['name']),
-                          subtitle: Text(place['formatted_address'] ?? ''),
-                          onTap: () {
-                            _selectPlace(place);
-                          },
-                        );
-                      },
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      height: 200,
+                      child: ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          final place = _searchResults[index];
+                          return ListTile(
+                            title: Text(place['name']),
+                            subtitle: Text(place['formatted_address'] ?? ''),
+                            onTap: () {
+                              _selectPlace(place);
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
               ],
             ),
           ),
-          Expanded(
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 10,
-              ),
-              onMapCreated: (controller) {
-                mapController = controller;
-              },
-              markers: _markers,
-            ),
-          ),
+          // O SlideMenu que ficará sobre o mapa, visível após a pesquisa
+          if (_isMenuVisible)
+            SlideMenu(menuItems: nearbyPlacesData),  // Exibe o SlideMenu quando a pesquisa for realizada
         ],
       ),
     );

@@ -33,6 +33,7 @@ flutter:
     - assets/images/welcome_image.png
     - assets/images/ease_image.png
     - assets/images/role_choice_image.png
+    - assets/coordinates.json
 
 
 

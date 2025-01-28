@@ -12,7 +12,20 @@
           "package_name": "com.boreis.parkking"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "189787245225-qj7d19luo726n9m5bqt8febf8atiulqv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.boreis.parkking",
+            "certificate_hash": "921f648591dd639fb8363f87a1f7fcb8eaa852f8"
+          }
+        },
+        {
+          "client_id": "189787245225-jj0rpcml92c56pe3mlk06aviq000spnu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCZoS6FUzV4jl0v-J6vHvdtw2kUz-Xn6tc"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "189787245225-jj0rpcml92c56pe3mlk06aviq000spnu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

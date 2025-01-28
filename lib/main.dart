@@ -32,7 +32,7 @@ class ParkKingApp extends StatelessWidget {
       routes: {
         '/intro': (context) => IntroSliderPage(),
         '/login': (context) => LoginPage(),
-        '/home': (context) => MyApp(),
+        '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
       },
     );
