@@ -52,7 +52,7 @@ android {
 
 dependencies {
     implementation 'com.google.firebase:firebase-analytics:21.0.0'  // Exemplo para analytics, adicione outros conforme necessário
-    // Outras dependências do Firebase
+    implementation 'com.google.firebase:firebase-firestore:24.0.0' 
 }
 
 // Adicione o plugin do Google Services no final do arquivo

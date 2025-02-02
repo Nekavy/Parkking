@@ -12,6 +12,7 @@ class Calculator {
 
     // Calcular a distância para cada ponto no JSON
     List<Map<String, dynamic>> distances = coordinates.map((place) {
+        print('Preço: ${place['price']}€');
       double distance = _calculateDistance(
         lat,
         lng,
@@ -25,6 +26,9 @@ class Calculator {
       return {
         'name': place['name'],
         'distance': distance,
+        'price': place['price'],
+        'lat': place['lat'],
+        'lng': place['lng'],
       };
     }).toList();
 

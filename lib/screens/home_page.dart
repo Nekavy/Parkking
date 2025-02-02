@@ -1,33 +1,51 @@
+// Importações necessárias para o funcionamento do app
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'components/utils/calculator.dart'; // Caminho para a classe
-import 'components/home/slide_menu.dart'; // SlideMenu importado
+import 'components/utils/calculator.dart';
+import 'components/utils/menubar.dart';
+import 'components/home/slide_menu.dart';
 
+// [CLASSE EXTERNA: HomePageLogic] - Toda a lógica de estado poderia ser movida para uma classe controller
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
-  List<Map<String, dynamic>> nearbyPlacesData = [];
 
+// [CLASSE EXTERNA: MapService] - Gestão do mapa e marcadores
+// [CLASSE EXTERNA: PlacesRepository] - Lógica de chamadas à API
 class _HomePageState extends State<HomePage> {
   late GoogleMapController mapController;
   Set<Marker> _markers = Set();
-  final LatLng _center = LatLng(37.7749, -122.4194); // Posição inicial do mapa
+  final LatLng _center = LatLng(37.7749, -122.4194);
   
+  // [CLASSE EXTERNA: SearchService] - Gestão de estado da pesquisa
   String _errorMessage = '';
   List<dynamic> _searchResults = [];
-  final String _apiKey = 'AIzaSyDdwdpjWLdkfnFwZnhtAG3z64cseSqcycc'; // Substituir pela tua chave da API
-  bool _isMenuVisible = false; // Controla a visibilidade do SlideMenu
+  final String _apiKey = 'AIzaSyDdwdpjWLdkfnFwZnhtAG3z64cseSqcycc';
   
-  // Função para buscar locais utilizando a Google Places API
+  // [CLASSE EXTERNA: MenuController] - Controle de visibilidade do menu
+  bool _isMenuVisible = false;
+  List<Map<String, dynamic>> nearbyPlacesData = [];
+
+  // [CLASSE EXTERNA: PlacesRepository] - Método deveria estar em um serviço de API
   Future<void> _searchPlaces(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults.clear();
+        _errorMessage = '';
+      });
+      return;
+    }
+
     final Uri url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/textsearch/json?query=$query&key=$_apiKey');
+      'https://maps.googleapis.com/maps/api/place/textsearch/json?query=$query&key=$_apiKey'
+    );
+
     try {
       final response = await http.get(url);
-
+      
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
@@ -36,51 +54,42 @@ class _HomePageState extends State<HomePage> {
         });
       } else {
         setState(() {
-          _errorMessage =
-              'Erro ao buscar locais. Código de status: ${response.statusCode}';
+          _errorMessage = 'Erro: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Erro ao buscar locais: $e';
+        _errorMessage = 'Erro de conexão: $e';
       });
     }
   }
 
-  void _selectPlace(dynamic place) async{
+  // [CLASSE EXTERNA: LocationService] - Lógica de processamento de localização
+  void _selectPlace(dynamic place) async {
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
-    final placeName = place['name'];
-    //testes envio de cordenadas para a calculadora
-    print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWLatitude: $lat");  
-    print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELongitude: $lng");
-    //calculator.calculate(lat, lng);
+    
     Calculator calculator = Calculator();
     List<Map<String, dynamic>> nearbyPlaces = await calculator.calculate(lat, lng);
-    nearbyPlacesData = nearbyPlaces;
-    print(nearbyPlaces); // Ver a lista no terminal
-
-    // Adicionar marcador e mover a câmara para a localização escolhida
+    
     setState(() {
+      nearbyPlacesData = nearbyPlaces;
       _markers.clear();
       _markers.add(Marker(
         markerId: MarkerId(place['place_id']),
         position: LatLng(lat, lng),
-        infoWindow: InfoWindow(title: placeName),
+        infoWindow: InfoWindow(title: place['name']),
       ));
+      _searchResults.clear();
+      _isMenuVisible = true;
     });
 
+    // [CLASSE EXTERNA: MapAnimations] - Animação deveria ser gerenciada separadamente
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(target: LatLng(lat, lng), zoom: 14),
       ),
     );
-
-    // Limpar resultados de pesquisa e mostrar o SlideMenu
-    setState(() {
-      _searchResults.clear();
-      _isMenuVisible = true; // Mostrar SlideMenu após mover o mapa
-    });
   }
 
   @override
@@ -89,18 +98,17 @@ class _HomePageState extends State<HomePage> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // O conteúdo principal, como o mapa
+          // [CLASSE EXTERNA: CustomMapWidget] - Widget de mapa personalizado
           GoogleMap(
             initialCameraPosition: CameraPosition(
               target: _center,
               zoom: 10,
             ),
-            onMapCreated: (controller) {
-              mapController = controller;
-            },
+            onMapCreated: (controller) => mapController = controller,
             markers: _markers,
           ),
-          // O menu de pesquisa sobre o mapa
+
+          // [CLASSE EXTERNA: SearchComponent] - Componente de pesquisa reutilizável
           Padding(
             padding: const EdgeInsets.only(top: 100.0, left: 16.0, right: 16.0),
             child: Column(
@@ -116,25 +124,11 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(30.0),
                       borderSide: BorderSide(color: Colors.grey, width: 1),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide(color: Colors.grey, width: 1),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide(color: Colors.blue, width: 2),
-                    ),
                   ),
-                  onChanged: (query) {
-                    if (query.isNotEmpty) {
-                      _searchPlaces(query);
-                    } else {
-                      setState(() {
-                        _searchResults.clear();
-                      });
-                    }
-                  },
+                  onChanged: (query) => _searchPlaces(query),
                 ),
+
+                // [CLASSE EXTERNA: ResultsList] - Lista de resultados modularizada
                 if (_searchResults.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
@@ -151,9 +145,7 @@ class _HomePageState extends State<HomePage> {
                           return ListTile(
                             title: Text(place['name']),
                             subtitle: Text(place['formatted_address'] ?? ''),
-                            onTap: () {
-                              _selectPlace(place);
-                            },
+                            onTap: () => _selectPlace(place),
                           );
                         },
                       ),
@@ -162,11 +154,13 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          // O SlideMenu que ficará sobre o mapa, visível após a pesquisa
+
+          // [CLASSE EXTERNA: SlideMenuController] - Gestão do estado do menu
           if (_isMenuVisible)
-            SlideMenu(menuItems: nearbyPlacesData),  // Exibe o SlideMenu quando a pesquisa for realizada
+            SlideMenu(menuItems: nearbyPlacesData),
         ],
       ),
+      bottomNavigationBar: BottomMenuBar("Mapa"),
     );
   }
 }

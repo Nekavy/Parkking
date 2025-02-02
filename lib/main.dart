@@ -4,6 +4,7 @@ import 'screens/intro_slider.dart'; // Exemplo de tela
 import 'screens/home_page.dart';
 import 'screens/login_page.dart'; // Exemplo de tela de login
 import 'screens/register_page.dart'; // Exemplo de tela de login
+import 'screens/components/services/dbcollect.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();  // Garante que os bindings do Flutter estão prontos
@@ -31,6 +32,7 @@ class ParkKingApp extends StatelessWidget {
       initialRoute: '/intro',  // Rota inicial
       routes: {
         '/intro': (context) => IntroSliderPage(),
+        //'/login': (context) => TestPage(),
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),

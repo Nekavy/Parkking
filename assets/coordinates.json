@@ -1,5 +1,6 @@
 [
-  { "name": "Ponto A", "lat": 37.7749, "lng": -122.4194 },
-  { "name": "Ponto B", "lat": 37.7849, "lng": -122.4294 },
-  { "name": "Ponto C", "lat": 37.7649, "lng": -122.4094 }
+  { "name": "Ponto A", "lat": 37.7749, "lng": -122.4194, "price": 5.50 },
+  { "name": "Ponto B", "lat": 37.7849, "lng": -122.4294, "price": 7.00 },
+  { "name": "Ponto C", "lat": 37.7649, "lng": -122.4094, "price": 6.20 },
+  { "name": "Ponto Z", "lat": 41.14961, "lng": -8.61099, "price": 6.20 }
 ]
