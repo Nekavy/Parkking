@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'components/services/FBColRegInfoUser.dart';  // Certifique-se de importar a classe criada
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -29,6 +31,8 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+    print("UID do utilizador registado: ${_auth.currentUser?.uid}");
+    registerUser();
       Navigator.pushReplacementNamed(context, '/home'); // Redireciona para a página principal após o registo
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -36,7 +40,18 @@ class _RegisterPageState extends State<RegisterPage> {
       );
     }
   }
+  void registerUser() async {
+    String role = 'admin';
+    String uid = FirebaseAuth.instance.currentUser?.uid ?? '';  // Obtém o UID do utilizador
+    String email = FirebaseAuth.instance.currentUser?.email ?? '';  // Obtém o email do utilizador
 
+    if (uid.isNotEmpty) {
+      // Chama a função para registar o utilizador com os dados fornecidos
+      await FBColRegInfoUser().regUserInfo(role, uid, email, context);
+    } else {
+      print('Erro: Utilizador não autenticado.');
+    }
+  }
   // Função para registo com Google
   Future<void> _registerWithGoogle() async {
     try {
@@ -49,8 +64,11 @@ class _RegisterPageState extends State<RegisterPage> {
         idToken: googleAuth.idToken,
       );
 
+
       await _auth.signInWithCredential(credential);
-      Navigator.pushReplacementNamed(context, '/home'); // Redireciona para a página principal
+      print("UID do utilizador registado via Google: ${_auth.currentUser?.uid}");
+      registerUser();
+       // Redireciona para a página principal
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro: ${e.message}')),
@@ -132,8 +150,8 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: _registerWithGoogle,
-                icon: Image.asset(
-                  'assets/google_logo.png', // Certifique-se de ter o logo do Google na pasta assets
+                icon: SvgPicture.asset(
+                  'assets/icones/google_logo.svg', // Certifique-se de ter o logo do Google na pasta assets
                   height: 24,
                   width: 24,
                 ),
@@ -146,7 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

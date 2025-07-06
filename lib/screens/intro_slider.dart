@@ -22,13 +22,13 @@ class _IntroSliderPageState extends State<IntroSliderPage> {
       "title": "Facilidade",
       "description": "Oferecemos opções de aluguel simples e rápidas.",
       "image": "assets/images/ease_image.png",
-      "caption": "Alugar nunca foi tão fácil!",
+      "caption": "Encontrar lugar nunca foi tão fácil!",
     },
     {
-      "title": "Escolha seu papel",
-      "description": "Arrendador ou Cliente, a escolha é sua.",
-      "image": "assets/images/role_choice_image.png",
-      "caption": "Decida como quer participar.",
+      "title": "Segurança",
+      "description": "Usa o teu espaço",
+      "image": "assets/images/ease_image.png",
+      "caption": "Arrendar o seu espaço nunca foi tão fácil!",
     },
   ];
 
@@ -42,14 +42,28 @@ class _IntroSliderPageState extends State<IntroSliderPage> {
           Container(
             color: Colors.white, // Fundo branco no topo
             padding: const EdgeInsets.only(top: 40.0, bottom: 16.0),
-            child: Text(
-              "ParkKing",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+            child: const Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Park',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF00313B), // Azul-petróleo escuro (mais sério)
+                  ),
+                ),
+                TextSpan(
+                  text: 'King',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFFFC107), // Amarelo dourado
+                  ),
+                ),
+              ],
             ),
+          ),
           ),
 
           // Slider com as imagens e texto
@@ -130,24 +144,6 @@ class _IntroSliderPageState extends State<IntroSliderPage> {
                 SizedBox(height: 24),
 
                 // Botões
-                ElevatedButton(
-                  onPressed:() { Navigator.of(context).pushReplacementNamed('/login');},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    minimumSize: Size(double.infinity, 56),
-                  ),
-                  child: Text(
-                    "Particular",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed:() { Navigator.of(context).pushReplacementNamed('/login');},
@@ -160,7 +156,7 @@ class _IntroSliderPageState extends State<IntroSliderPage> {
                     minimumSize: Size(double.infinity, 56),
                   ),
                   child: Text(
-                    "Cliente",
+                    "Entrar",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

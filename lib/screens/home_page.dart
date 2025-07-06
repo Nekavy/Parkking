@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'components/utils/calculator.dart';
 import 'components/utils/menubar.dart';
 import 'components/home/slide_menu.dart';
+import 'components/home/filters.dart';
+import 'components/services/geohash_service.dart';
+import 'components/services/searchPontosByGeohash.dart';
 
 // [CLASSE EXTERNA: HomePageLogic] - Toda a lógica de estado poderia ser movida para uma classe controller
 class HomePage extends StatefulWidget {
@@ -26,7 +29,6 @@ class _HomePageState extends State<HomePage> {
   final String _apiKey = 'AIzaSyDdwdpjWLdkfnFwZnhtAG3z64cseSqcycc';
   
   // [CLASSE EXTERNA: MenuController] - Controle de visibilidade do menu
-  bool _isMenuVisible = false;
   List<Map<String, dynamic>> nearbyPlacesData = [];
 
   // [CLASSE EXTERNA: PlacesRepository] - Método deveria estar em um serviço de API
@@ -68,9 +70,17 @@ class _HomePageState extends State<HomePage> {
   void _selectPlace(dynamic place) async {
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
+    String geohash = GeohashService().getGeohash(lat, lng);
+    print('Geohash gerado: $geohash');
+    print('latelngfeed:$lat ,$lng');
+    
+    List<Map<String, dynamic>> pontos = await FirestoreService().searchPontosByGeohash(geohash);
+    print('pontos:$pontos');
+    //print(' ${pontos['parkId']}'); 
+    
     
     Calculator calculator = Calculator();
-    List<Map<String, dynamic>> nearbyPlaces = await calculator.calculate(lat, lng);
+    List<Map<String, dynamic>> nearbyPlaces = await calculator.calculate(lat, lng, pontos); // lat e lng pesquisada mais a lista da firebase enviado para o calculator
     
     setState(() {
       nearbyPlacesData = nearbyPlaces;
@@ -81,7 +91,6 @@ class _HomePageState extends State<HomePage> {
         infoWindow: InfoWindow(title: place['name']),
       ));
       _searchResults.clear();
-      _isMenuVisible = true;
     });
 
     // [CLASSE EXTERNA: MapAnimations] - Animação deveria ser gerenciada separadamente
@@ -106,8 +115,9 @@ class _HomePageState extends State<HomePage> {
             ),
             onMapCreated: (controller) => mapController = controller,
             markers: _markers,
+            zoomControlsEnabled: false,
+            mapToolbarEnabled: false,
           ),
-
           // [CLASSE EXTERNA: SearchComponent] - Componente de pesquisa reutilizável
           Padding(
             padding: const EdgeInsets.only(top: 100.0, left: 16.0, right: 16.0),
@@ -154,13 +164,11 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-
           // [CLASSE EXTERNA: SlideMenuController] - Gestão do estado do menu
-          if (_isMenuVisible)
             SlideMenu(menuItems: nearbyPlacesData),
+            FilterWidget(), 
         ],
       ),
-      bottomNavigationBar: BottomMenuBar("Mapa"),
     );
   }
 }

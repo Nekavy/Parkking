@@ -22,53 +22,65 @@ class BottomMenuBar extends StatelessWidget {
         currentIndex = 2;
         break;
       case "Perfil":
-        currentIndex = 3;
+        currentIndex = 4;
         break;
       default:
         currentIndex = 0;
     }
 
-    return BottomNavigationBar(
-      backgroundColor: Colors.white,
-      currentIndex: currentIndex, // O item selecionado
-      type: BottomNavigationBarType.fixed, // Certifica-se de mostrar todos os itens
-      onTap: (index) {
-        // Navegação ao clicar nos botões
-        String route;
-        switch (index) {
-          case 0:
-            route = "Mapa";
-            break;
-          case 1:
-            route = "Fav";
-            break;
-          case 2:
-            route = "Reservas";
-            break;
-          case 3:
-            route = "Perfil";
-            break;
-          default:
-            route = "Mapa";
-        }
-        Navigator.pushNamed(context, route);
-      },
-      items: [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.map),
-          label: 'Mapa',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.favorite),
-          label: 'Favoritos',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
-          label: 'Reservas',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Perfil',
+    return Column(
+      children: [
+        // Adicionando o BottomNavigationBar dentro do SlideMenu
+        BottomNavigationBar(
+          backgroundColor: Colors.white,
+          currentIndex: currentIndex, // O item selecionado
+          type: BottomNavigationBarType.fixed, // Certifica-se de mostrar todos os itens
+          onTap: (index) {
+            // Se a página atual já estiver ativa, não faz nada
+            if (index == currentIndex) return;
+
+            // Navegação ao clicar nos botões
+            String route;
+            switch (index) {
+              case 0:
+                route = "/home";
+                break;
+              case 1:
+                route = "/reservas";
+                break;
+              case 2:
+                route = "/ad";
+                break;
+              case 3:
+                route = "/cm";
+                break;
+              default:
+                route = "/profile";
+            }
+            Navigator.pushNamed(context, route); // Usando pushNamed em vez de pushReplacementNamed
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.map),
+              label: 'Mapa',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'Reservas',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add),
+              label: 'Anuncie',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.message),
+              label: 'Mensagens',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Perfil',
+            ),
+          ],
         ),
       ],
     );

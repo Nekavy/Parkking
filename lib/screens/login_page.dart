@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   
   // Configuração do GoogleSignIn com Web Client ID
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: "189787245225-jj0rpcml92c56pe3mlk06aviq000spnu.apps.googleusercontent.com", // Substitui pelo teu Web Client ID do Firebase
+    clientId: "754573529501-9aqbhfdsu1iapt2gr26slsuitcpihhm3.apps.googleusercontent.com", // Substitui pelo teu Web Client ID do Firebase
   );
 
   // Função para login com email e senha
@@ -74,14 +75,28 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                "ParkKing",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                const Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Park',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00313B), // azul-escuro ou personalizado
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'King',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFFFC107), // dourado/amarelo
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               const SizedBox(height: 12),
               const Text(
                 "Entre na sua conta rapidamente.",
@@ -115,22 +130,27 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+                ElevatedButton.icon(
                 onPressed: _loginWithGoogle,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // Cor do botão do Google
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  minimumSize: const Size(double.infinity, 50),
+                icon: SvgPicture.asset(
+                  'assets/icones/google_logo.svg', // Certifique-se de ter o logo do Google na pasta assets
+                  height: 24,
+                  width: 24,
                 ),
-                child: const Text(
+                label: const Text(
                   "Entrar com Google",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  minimumSize: const Size(double.infinity, 50),
                 ),
               ),
               const SizedBox(height: 24),

@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'screens/intro_slider.dart'; // Exemplo de tela
+import 'package:firebase_auth/firebase_auth.dart'; // Importar para acessar o userId
+import 'screens/intro_slider.dart';
 import 'screens/home_page.dart';
-import 'screens/login_page.dart'; // Exemplo de tela de login
-import 'screens/register_page.dart'; // Exemplo de tela de login
-import 'screens/components/services/dbcollect.dart'; 
+import 'screens/login_page.dart';
+import 'screens/register_page.dart';
+import 'screens/profile_page.dart';
+import 'screens/advertise.dart';
+import 'screens/chat_manager.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();  // Garante que os bindings do Flutter estão prontos
+  WidgetsFlutterBinding.ensureInitialized();
   try {
-    // Inicializa o Firebase
     await Firebase.initializeApp();
   } catch (e) {
     print("Erro ao inicializar o Firebase: $e");
   }
-  runApp(ParkKingApp());  // Chama o app após a inicialização
+  runApp(ParkKingApp());
 }
 
 class ParkKingApp extends StatelessWidget {
@@ -24,18 +26,29 @@ class ParkKingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ParkKing',
-      debugShowCheckedModeBanner: false,  // Remove o banner de debug
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue, 
+        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/intro',  // Rota inicial
+      initialRoute: '/intro',
       routes: {
         '/intro': (context) => IntroSliderPage(),
-        //'/login': (context) => TestPage(),
         '/login': (context) => LoginPage(),
-        '/home': (context) => HomePage(),
+        '/ad': (context) => AdCreationPage(),
         '/register': (context) => RegisterPage(),
+        '/home': (context) => HomePage(),
+        '/profile': (context) => ProfilePage(),
+        '/cm': (context) {
+          final userId = FirebaseAuth.instance.currentUser?.uid;
+          if (userId != null) {
+            // Passar o userId para o ChatManager
+            return ChatManager(userId: userId);
+          } else {
+            // Caso o usuário não esteja autenticado
+            return Center(child: Text('Usuário não autenticado.'));
+          }
+        },
       },
     );
   }
