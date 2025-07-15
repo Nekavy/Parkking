@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'components/services/FBColRegInfoUser.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -35,25 +37,38 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+    void registerUser() async {
+    String role = 'client';
+    String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    String email = FirebaseAuth.instance.currentUser?.email ?? '';
+    String nome = FirebaseAuth.instance.currentUser?.displayName ?? '';
+    String telefone = '';
+
+    if (uid.isNotEmpty) {
+      await FBColRegInfoUser().regUserInfo(role, uid, email, context, nome, telefone);
+    }
+  }
   // Função para login com Google
   Future<void> _loginWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+        try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
 
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
       await _auth.signInWithCredential(credential);
-      Navigator.pushReplacementNamed(context, '/home');
+      registerUser();
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro: ${e.message}')),
       );
     }
   }
+  
 
   @override
   Widget build(BuildContext context) {

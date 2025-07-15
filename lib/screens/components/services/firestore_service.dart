@@ -10,7 +10,6 @@ class FirestoreService {
           .collection('points')
           .where('geohash', isGreaterThanOrEqualTo: geohashPrefix)
           .where('geohash', isLessThanOrEqualTo: '$geohashPrefix\uf8ff')
-          .limit(50) // Limita a 50 pontos para performance
           .get();
 
       List<Map<String, dynamic>> points = querySnapshot.docs.map((doc) {

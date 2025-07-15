@@ -30,16 +30,30 @@ class BottomMenuBar extends StatelessWidget {
 
     return Column(
       children: [
-        // Adicionando o BottomNavigationBar dentro do SlideMenu
         BottomNavigationBar(
           backgroundColor: Colors.white,
-          currentIndex: currentIndex, // O item selecionado
-          type: BottomNavigationBarType.fixed, // Certifica-se de mostrar todos os itens
+          currentIndex: currentIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Color(0xFF00313B),     // Cor do item selecionado
+          unselectedItemColor: Colors.grey,         // Cor dos itens não selecionados
+          selectedIconTheme: IconThemeData(
+            size: 28,
+            color: Color(0xFF00313B),
+          ),
+          unselectedIconTheme: IconThemeData(
+            size: 24,
+            color: Colors.grey,
+          ),
+          selectedLabelStyle: TextStyle(
+            color: Color(0xFF00313B),
+            fontWeight: FontWeight.bold,
+          ),
+          unselectedLabelStyle: TextStyle(
+            color: Colors.grey,
+          ),
           onTap: (index) {
-            // Se a página atual já estiver ativa, não faz nada
             if (index == currentIndex) return;
 
-            // Navegação ao clicar nos botões
             String route;
             switch (index) {
               case 0:
@@ -57,7 +71,7 @@ class BottomMenuBar extends StatelessWidget {
               default:
                 route = "/profile";
             }
-            Navigator.pushNamed(context, route); // Usando pushNamed em vez de pushReplacementNamed
+            Navigator.pushNamed(context, route);
           },
           items: [
             BottomNavigationBarItem(

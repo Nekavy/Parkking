@@ -1,45 +1,62 @@
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import necessário para GeoPoint
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Calculator {
   Future<List<Map<String, dynamic>>> calculate(
       double lat, double lng, List<Map<String, dynamic>> pontos) async {
-    // Calcular a distância para cada ponto na lista
-    List<Map<String, dynamic>> distances = pontos.map((place) {
+    List<Map<String, dynamic>> distances = [];
+
+    for (final place in pontos) {
       final coordinates = place['coordinates'];
 
-      if (coordinates is GeoPoint) { // Verifica se é um GeoPoint
+      if (coordinates is GeoPoint) {
         double placeLat = coordinates.latitude;
         double placeLng = coordinates.longitude;
 
         double distance = _calculateDistance(lat, lng, placeLat, placeLng);
 
         print('Distância de ${place['name']} : ${distance.toStringAsFixed(2)} km');
-        print('id parqur${place['parkId']} : ${distance.toStringAsFixed(2)} km');
+        print('id parque ${place['parkId']} : ${distance.toStringAsFixed(2)} km');
 
-        return {
+        // Buscar nome do utilizador com base no userid
+        String ownerId = place['userid'];
+        String ownerName = await _getUserNameById(ownerId);
+
+        distances.add({
           'name': place['name'],
           'distance': distance,
           'price': place['price'],
           'lat': placeLat,
           'lng': placeLng,
           'parkId': place['parkId'],
-        };
+          'ownerid': ownerId,
+          'owner': ownerName,
+        });
       } else {
         print("Erro: 'coordinates' inválido para ${place['name']}");
-        return null;
       }
-    }).where((element) => element != null).cast<Map<String, dynamic>>().toList(); // Remove valores nulos
+    }
 
-    // Ordenar por distância (mais próximos primeiro)
+    // Ordenar por distância
     distances.sort((a, b) => a['distance'].compareTo(b['distance']));
-
-    return distances; // Retorna a lista ordenada
+    return distances;
   }
 
-  // Função para calcular a distância entre dois pontos (em km)
+  Future<String> _getUserNameById(String userId) async {
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      if (doc.exists) {
+        final data = doc.data();
+        return data?['nome'] ?? '';
+      }
+    } catch (e) {
+      print('Erro ao obter nome do utilizador ($userId): $e');
+    }
+    return '';
+  }
+
   double _calculateDistance(double lat1, double lng1, double lat2, double lng2) {
-    const double radius = 6371; // Raio da Terra em km
+    const double radius = 6371;
     double dLat = _degToRad(lat2 - lat1);
     double dLng = _degToRad(lng2 - lng1);
 
@@ -51,6 +68,5 @@ class Calculator {
     return radius * c;
   }
 
-  // Converter graus para radianos
   double _degToRad(double deg) => deg * (pi / 180);
 }

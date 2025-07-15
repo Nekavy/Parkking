@@ -1,5 +1,5 @@
-// Importações necessárias para o funcionamento do app
 import 'dart:convert';
+import 'chat_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -10,28 +10,23 @@ import 'components/home/filters.dart';
 import 'components/services/geohash_service.dart';
 import 'components/services/searchPontosByGeohash.dart';
 
-// [CLASSE EXTERNA: HomePageLogic] - Toda a lógica de estado poderia ser movida para uma classe controller
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-// [CLASSE EXTERNA: MapService] - Gestão do mapa e marcadores
-// [CLASSE EXTERNA: PlacesRepository] - Lógica de chamadas à API
 class _HomePageState extends State<HomePage> {
   late GoogleMapController mapController;
   Set<Marker> _markers = Set();
   final LatLng _center = LatLng(37.7749, -122.4194);
-  
-  // [CLASSE EXTERNA: SearchService] - Gestão de estado da pesquisa
+
   String _errorMessage = '';
   List<dynamic> _searchResults = [];
   final String _apiKey = 'AIzaSyDdwdpjWLdkfnFwZnhtAG3z64cseSqcycc';
-  
-  // [CLASSE EXTERNA: MenuController] - Controle de visibilidade do menu
-  List<Map<String, dynamic>> nearbyPlacesData = [];
 
-  // [CLASSE EXTERNA: PlacesRepository] - Método deveria estar em um serviço de API
+  List<Map<String, dynamic>> nearbyPlacesData = [];
+  List<Map<String, dynamic>> filteredPlaces = [];
+
   Future<void> _searchPlaces(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -47,7 +42,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       final response = await http.get(url);
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
@@ -66,22 +61,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // [CLASSE EXTERNA: LocationService] - Lógica de processamento de localização
   void _selectPlace(dynamic place) async {
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
     String geohash = GeohashService().getGeohash(lat, lng);
     print('Geohash gerado: $geohash');
     print('latelngfeed:$lat ,$lng');
-    
+
     List<Map<String, dynamic>> pontos = await FirestoreService().searchPontosByGeohash(geohash);
     print('pontos:$pontos');
-    //print(' ${pontos['parkId']}'); 
-    
-    
+
     Calculator calculator = Calculator();
-    List<Map<String, dynamic>> nearbyPlaces = await calculator.calculate(lat, lng, pontos); // lat e lng pesquisada mais a lista da firebase enviado para o calculator
-    
+    List<Map<String, dynamic>> nearbyPlaces = await calculator.calculate(lat, lng, pontos);
+    print('nearplaces:$nearbyPlaces');
+
     setState(() {
       nearbyPlacesData = nearbyPlaces;
       _markers.clear();
@@ -93,7 +86,6 @@ class _HomePageState extends State<HomePage> {
       _searchResults.clear();
     });
 
-    // [CLASSE EXTERNA: MapAnimations] - Animação deveria ser gerenciada separadamente
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(target: LatLng(lat, lng), zoom: 14),
@@ -107,7 +99,6 @@ class _HomePageState extends State<HomePage> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // [CLASSE EXTERNA: CustomMapWidget] - Widget de mapa personalizado
           GoogleMap(
             initialCameraPosition: CameraPosition(
               target: _center,
@@ -118,7 +109,6 @@ class _HomePageState extends State<HomePage> {
             zoomControlsEnabled: false,
             mapToolbarEnabled: false,
           ),
-          // [CLASSE EXTERNA: SearchComponent] - Componente de pesquisa reutilizável
           Padding(
             padding: const EdgeInsets.only(top: 100.0, left: 16.0, right: 16.0),
             child: Column(
@@ -137,8 +127,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onChanged: (query) => _searchPlaces(query),
                 ),
-
-                // [CLASSE EXTERNA: ResultsList] - Lista de resultados modularizada
                 if (_searchResults.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
@@ -164,9 +152,8 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          // [CLASSE EXTERNA: SlideMenuController] - Gestão do estado do menu
-            SlideMenu(menuItems: nearbyPlacesData),
-            FilterWidget(), 
+          SlideMenu(menuItems: nearbyPlacesData),
+          FilterWidget(),
         ],
       ),
     );

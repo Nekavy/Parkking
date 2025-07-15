@@ -15,19 +15,19 @@ class _IntroSliderPageState extends State<IntroSliderPage> {
     {
       "title": "Bem-vindo!",
       "description": "Explore o nosso aplicativo e comece agora.",
-      "image": "assets/images/welcome_image.png",
+      "image": "assets/images/Welcome.png",
       "caption": "Descubra a facilidade do nosso serviço.",
     },
     {
       "title": "Facilidade",
       "description": "Oferecemos opções de aluguel simples e rápidas.",
-      "image": "assets/images/ease_image.png",
+      "image": "assets/images/Easy.png",
       "caption": "Encontrar lugar nunca foi tão fácil!",
     },
     {
       "title": "Segurança",
       "description": "Usa o teu espaço",
-      "image": "assets/images/ease_image.png",
+      "image": "assets/images/Security.png",
       "caption": "Arrendar o seu espaço nunca foi tão fácil!",
     },
   ];

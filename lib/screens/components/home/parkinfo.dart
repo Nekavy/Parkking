@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../chat_screen.dart'; // Importação da tela de chat
+import '../../chat_screen.dart';
 
 class ParkInfo extends StatelessWidget {
   final Map<String, dynamic> parkData;
-
+  
   const ParkInfo({super.key, required this.parkData});
+
+  static const Color primaryColor = Color(0xFF00313B);
+  static const Color white = Colors.white;
 
   @override
   Widget build(BuildContext context) {
+    print('🚗 parkData: $parkData');
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
-        title: Text(parkData['name'] ?? 'Detalhes do Parque'),
+        backgroundColor: white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          parkData['name'] ?? 'Detalhes do Parque',
+          style: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.share),
+            icon: const Icon(Icons.share, color: primaryColor),
             onPressed: () {},
           ),
         ],
@@ -29,25 +43,35 @@ class ParkInfo extends StatelessWidget {
                   // Imagem
                   Container(
                     height: 250,
-                    color: Colors.grey[300],
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.05),
+                      image: parkData['image'] != null
+                          ? DecorationImage(
+                              image: NetworkImage(parkData['image']),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
                     alignment: Alignment.center,
-                    child: Icon(Icons.photo_camera, size: 50, color: Colors.grey[600]),
+                    child: parkData['image'] == null
+                        ? const Icon(Icons.photo_camera, size: 50, color: primaryColor)
+                        : null,
                   ),
 
                   // Nome e preço
                   Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           parkData['name'] ?? 'Parque Sem Nome',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           '${parkData['price'] ?? 'Gratuito'} €',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
                         ),
                       ],
                     ),
@@ -55,7 +79,7 @@ class ParkInfo extends StatelessWidget {
 
                   // Localização e detalhes
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -72,18 +96,25 @@ class ParkInfo extends StatelessWidget {
 
           // Botões fixos no fundo
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    icon: Icon(Icons.chat),
-                    label: Text('Chat'),
-                    style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                    icon: const Icon(Icons.chat),
+                    label: const Text('Chat'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     onPressed: () {
                       if (parkData['parkId'] == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('ID do parque não encontrado.')),
+                          const SnackBar(content: Text('ID do parque não encontrado.')),
                         );
                         return;
                       }
@@ -93,20 +124,30 @@ class ParkInfo extends StatelessWidget {
                           builder: (context) => ChatScreen(
                             parkId: parkData['parkId']!,
                             userId: FirebaseAuth.instance.currentUser!.uid,
+                            ownerId: parkData['ownerid'],  // com i minúsculo para bater com o mapa
+                            owner: parkData['owner'] ,
                           ),
+
                         ),
                       );
                     },
                   ),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton.icon(
-                    icon: Icon(Icons.call),
-                    label: Text('Ligar'),
-                    style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.green),
+                    icon: const Icon(Icons.call),
+                    label: const Text('Ligar'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     onPressed: () {
-                      // Adicione a lógica para fazer uma chamada telefônica
+                      // Lógica para chamada telefónica
                     },
                   ),
                 ),
@@ -117,14 +158,20 @@ class ParkInfo extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildDetailRow(IconData icon, String text) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey[600]),
-          SizedBox(width: 8),
-          Text(text, style: TextStyle(fontSize: 16)),
+          Icon(icon, color: primaryColor),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 16, color: primaryColor),
+            ),
+          ),
         ],
       ),
     );

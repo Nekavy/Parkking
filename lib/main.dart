@@ -41,6 +41,7 @@ class ParkKingApp extends StatelessWidget {
         '/profile': (context) => ProfilePage(),
         '/cm': (context) {
           final userId = FirebaseAuth.instance.currentUser?.uid;
+          
           if (userId != null) {
             // Passar o userId para o ChatManager
             return ChatManager(userId: userId);
